@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+
+    <link
+      href="https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="./css/style.css" rel="stylesheet" type="text/css" />
+    <title></title>
+  </head>
+  <body class="typora-export">
+    <div class="typora-export-content">
+      <div id="write" class="">
+        <h1 id="tianjingli的签名验证页"><span>Tianjingli的签名页</span></h1>
+        <strong
+          ><span>注意：认准「tianjingli.github.io」开头的域名！</span></strong
+        >
+        
+        <hr />
+        <p>&nbsp;</p>
+        <p><span>请在此粘贴需要签名的信息：</span></p>
+
+        <textarea
+                id="message"
+                onkeyup="rsaSign()"
+          class="md-fences md-end-block ty-contain-cm modeLoaded"
+          rows="6"
+          style="width: 100%; resize: none; margin: 0 auto"
+        ></textarea>
+
+        <p><span>私钥：</span></p>
+
+        <textarea
+                id="private_key"
+                onkeyup="rsaSign()"
+          class="md-fences md-end-block ty-contain-cm modeLoaded"
+          rows="6"
+          style="width: 100%; resize: none; margin: 0 auto"
+        ></textarea>
+        <p><span>结果：</span></p>
+
+        <textarea
+                id="output"
+          class="md-fences md-end-block ty-contain-cm modeLoaded"
+          rows="6"
+          style="width: 100%; resize: none; margin: 0 auto"
+        ></textarea>
+        <br/>
+        <button>双击复制</button>
+        <hr />
+        <a href="https://tianjingli.github.io/my_public_key/"
+          ><span>Tianjingli的RSA公钥</span></a
+        >
+        <br />
+        <a href="https://tianjingli.github.io"><span>主页</span></a>
+      </div>
+    </div>
+    <script src="./js/jsencrypt.min.js"></script>
+    <script src="./js/crypto-js.min.js"></script>
+  <script>
+    function rsaSign() {
+      var jsEncrypt = new JSEncrypt();
+      let privateKey = document.getElementById("private_key").value;
+      let message = document.getElementById("message").value;
+
+      if (message.length > 0 && privateKey.length > 0) {
+        jsEncrypt.setPrivateKey(privateKey);
+        // 签名时抹去换行符
+        let signature = jsEncrypt.sign(message.replace(/\n*/g,""), CryptoJS.SHA256, "sha256");
+        if (signature == false) {
+          document.getElementById("output").innerHTML =
+                  "签名失败，请检查私钥是否正确";
+        } else {
+          document.getElementById("output").innerHTML =
+                  message + "\n----- 以下为此信息签名值，可从此行复制（以「==」结尾）前往「https://tianjingli.github.io/verify/」以验证此信息（横杠及此内容不属于信息） -----\n" +
+                  signature;
+        }
+      } else {
+        document.getElementById("signature").innerHTML = "请输入私钥及内容";
+      }
+    }
+  </script>
+  </body>
+</html>

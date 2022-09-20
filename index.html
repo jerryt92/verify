@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width initial-scale=1"/>
+
+    <link
+            href="https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext"
+            rel="stylesheet"
+            type="text/css"
+    />
+    <link href="./css/style.css" rel="stylesheet" type="text/css"/>
+    <title></title>
+</head>
+<body class="typora-export">
+<div class="typora-export-content">
+    <div id="write" class="">
+        <h1 id="tianjingli的签名验证页"><span>Tianjingli的签名验证页</span></h1>
+
+        <strong><span>注意：认准「tianjingli.github.io」开头的域名！</span></strong>
+
+        <hr/>
+        <p>&nbsp;</p>
+        <p><span>请在此粘贴需要验证的信息：</span></p>
+
+        <textarea id="message" class="md-fences md-end-block ty-contain-cm modeLoaded" rows="6"
+                  style="width:100%;resize:none;margin: 0 auto;" onkeyup="verifySignature()"></textarea>
+
+        <p><span>请在此粘贴签名值：</span></p>
+
+        <textarea id="signature" class="md-fences md-end-block ty-contain-cm modeLoaded" rows="6"
+                  style="width:100%;resize:none;margin: 0 auto;" onkeyup="verifySignature()"></textarea>
+        <br/>
+        <button onclick="verifySignature()">再次验证</button>
+        <p><span>验证结果：<strong><span id="verify_output" style="color:red">验证失败</span></strong></span>
+        <p>&nbsp;</p>
+        <hr/>
+        <a href="https://tianjingli.github.io/my_public_key/"
+        ><span>Tianjingli的RSA公钥</span></a
+        >
+        <br/>
+        <a href="https://tianjingli.github.io"><span>主页</span></a>
+    </div>
+</div>
+<script src="./js/jsencrypt.min.js"></script>
+<script src="./js/crypto-js.min.js"></script>
+<script>
+
+    // Tianjingli's Public Key
+    // https://tianjingli.github.io/my_public_key/
+    let publicKey = "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmlosdz+XTNepp5UwNyBoolSJ/RHBGtp9+ekXo3dwS8ucVwWYZ4UsIxx+SUc8R3CtaFJmzNhZ7kzBG+gI8RKEy+my7G2dy9nr4FAMddxOj41Od2sE4FBU3JztzcV1dtU8KXP8+TlMxW63m6Wb0b++i4VsLUuIHLfu9+Bj3rF1suLDIuxmhjpynxBPHUf/hyFJpoAANolrIyGl7MrNju7cmlwztG3mN6bxekimmwzJhK299mYYuRPfAvaVkK39fo7ERyXFigJzlMYVZFD4fzT9jl5zXoOHDfwhHA1R5oleSQVmevdCCex48vYaBBSzRLzp8/ipeLzN13K+AC2RCMbuGQIDAQAB-----END PUBLIC KEY-----"
+
+    function verifySignature() {
+        let inputMessage = document.getElementById("message").value;
+        let inputSignature = document.getElementById("signature").value;
+        if (inputMessage && inputSignature.length >= 344) {
+            var jsEncrypt = new JSEncrypt();
+            let message = inputMessage;
+            let signature = inputSignature.slice(inputSignature.length - 344, inputSignature.length);
+            console.log("Signature = " + signature);
+            console.log("Message = " + message);
+            if (signature.length > 0 && message.length > 0) {
+                jsEncrypt.setPublicKey(publicKey);
+                // 验证时抹去换行符
+                var verified = jsEncrypt.verify(message.replace(/\n*/g,""), signature.replace(/\n*/g,""), CryptoJS.SHA256);
+                if (verified == true) {
+                    document.getElementById("verify_output").style.cssText = "color : green";
+                    document.getElementById("verify_output").innerHTML = "验证成功";
+                } else {
+                    document.getElementById("verify_output").style.cssText = "color : red";
+                    document.getElementById("verify_output").innerHTML = "验证失败";
+                }
+            }
+        } else {
+            document.getElementById("verify_output").style.cssText = "color : red";
+            document.getElementById("verify_output").innerHTML = "验证失败";
+        }
+    }
+</script>
+</body>
+</html>
