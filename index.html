@@ -72,9 +72,9 @@
         // 抹去换行符和空格
         let input = document.getElementById("input").value.replace(/\n*/g, "");
         input = input.replace(/\s+/g, "");
-        if (input) {
+        if (input>0) {
           let inputArr = input.split('#');
-          if (input.length >= 344 && inputArr.length) {
+          if (input.length >= 344 && inputArr.length>=3) {
             let tipLength = inputArr[inputArr.length-2].length + 6 + 6;
             var jsEncrypt = new JSEncrypt();
             let message = input.slice(0, input.length - 344 - tipLength);
