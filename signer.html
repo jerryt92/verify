@@ -3,54 +3,76 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width initial-scale=1" />
-
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <link
       href="https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext"
       rel="stylesheet"
       type="text/css"
     />
     <link href="./css/style.css" rel="stylesheet" type="text/css" />
-    <title></title>
+    <title>签名器</title>
   </head>
   <body class="typora-export">
     <div class="typora-export-content">
       <div id="write" class="">
-        <h1 id="tianjingli的签名验证页"><span>Tianjingli的签名页</span></h1>
+        <h1 id="tianjingli的签名验证页"><span>Tianjingli的签名器</span><span>&nbsp;</span><span style="color: #6E6E73;font-size: small;">版本：1.0</span></h1>
         <strong
           ><span>注意：认准「tianjingli.github.io」开头的域名！</span></strong
         >
-        
+
         <hr />
-        <p>&nbsp;</p>
-        <p><span>请在此粘贴需要签名的信息：</span></p>
-
-        <textarea
-                id="message"
-                onkeyup="rsaSign()"
-          class="md-fences md-end-block ty-contain-cm modeLoaded"
-          rows="6"
-          style="width: 100%; resize: none; margin: 0 auto"
-        ></textarea>
-
+        
         <p><span>私钥：</span></p>
 
         <textarea
-                id="private_key"
-                onkeyup="rsaSign()"
+          id="private_key"
+          onkeyup="rsaSign()"
           class="md-fences md-end-block ty-contain-cm modeLoaded"
           rows="6"
           style="width: 100%; resize: none; margin: 0 auto"
         ></textarea>
+        <br />
+        <button
+          onclick="saveLocation()"
+        >
+          在本机保存私钥
+        </button>
+        <button onclick="clearLocation()">清除本机保存的私钥</button>
+
+        <p><span>请在此输入需要签名的信息：</span></p>
+
+        <textarea
+          id="message"
+          onkeyup="rsaSign()"
+          class="md-fences md-end-block ty-contain-cm modeLoaded"
+          rows="6"
+          style="width: 100%; resize: none; margin: 0 auto"
+        ></textarea>
+        <br />
+        <button onclick="paste()">粘贴</button>
+        <button onclick="document.getElementById('message').value=''">
+          清除
+        </button>
+
         <p><span>结果：</span></p>
 
         <textarea
-                id="output"
+          id="output"
           class="md-fences md-end-block ty-contain-cm modeLoaded"
           rows="6"
           style="width: 100%; resize: none; margin: 0 auto"
-        ></textarea>
-        <br/>
-        <button>双击复制</button>
+        >
+请输入私钥及内容</textarea
+        >
+        <br />
+        <button
+          id="button"
+          onclick="rsaSign();copy('button','output')"
+          onmouseout="this.innerHTML='双击复制'"
+        >
+          双击复制
+        </button>
         <hr />
         <a href="https://tianjingli.github.io/my_public_key/"
           ><span>Tianjingli的RSA公钥</span></a
@@ -61,28 +83,73 @@
     </div>
     <script src="./js/jsencrypt.min.js"></script>
     <script src="./js/crypto-js.min.js"></script>
-  <script>
-    function rsaSign() {
-      var jsEncrypt = new JSEncrypt();
-      let privateKey = document.getElementById("private_key").value;
-      let message = document.getElementById("message").value;
+    <script src="./js/clipboard.js"></script>
+    <script>
+      // 生成在信息中后的提示，插入在-----# #-----中，可随意修改
+      let tip = " 复制全部内容，前往「https://tianjingli.github.io/verify」以验证 ";
 
-      if (message.length > 0 && privateKey.length > 0) {
-        jsEncrypt.setPrivateKey(privateKey);
-        // 签名时抹去换行符
-        let signature = jsEncrypt.sign(message.replace(/\n*/g,""), CryptoJS.SHA256, "sha256");
-        if (signature == false) {
-          document.getElementById("output").innerHTML =
-                  "签名失败，请检查私钥是否正确";
+      document.getElementById("private_key").value =
+        localStorage.getItem("private_key");
+      function rsaSign() {
+        var jsEncrypt = new JSEncrypt();
+        let privateKey = document.getElementById("private_key").value;
+        let message = document.getElementById("message").value;
+
+        if (message.length > 0 && privateKey.length > 0) {
+          jsEncrypt.setPrivateKey(privateKey);
+          // 签名时抹去换行符和空格
+          let signature = jsEncrypt.sign(message.replace(/\n*/g, "").replace(/\s+/g, ""), CryptoJS.SHA256, "sha256");
+          if (signature == false) {
+            document.getElementById("output").value =
+              "签名失败，请检查私钥是否正确";
+          } else {
+            document.getElementById("output").value =
+              message +
+              "\n\n-----#"+tip+"#-----\n\n" +
+              signature;
+          }
         } else {
-          document.getElementById("output").innerHTML =
-                  message + "\n----- 以下为此信息签名值，可从此行复制（以「==」结尾）前往「https://tianjingli.github.io/verify/」以验证此信息（横杠及此内容不属于信息） -----\n" +
-                  signature;
+          document.getElementById("output").value = "请输入私钥及内容";
         }
-      } else {
-        document.getElementById("signature").innerHTML = "请输入私钥及内容";
       }
-    }
-  </script>
+
+      function paste() {
+        navigator.clipboard.readText().then((text) => {
+          document.getElementById("message").value = text;
+          rsaSign();
+        });
+      }
+
+      function copy(btn_id, value_id) {
+        var btn = document.getElementById(btn_id);
+        var clipboard = new ClipboardJS(btn, {
+          //绑定元素id
+          text: function () {
+            var str = document.getElementById(value_id).value;
+            return str;
+          },
+        });
+        clipboard.on("success", function (e) {
+          btn.innerHTML = "已复制";
+        });
+        clipboard.on("error", function (e) {
+          alert("内容为空");
+        });
+      }
+
+      function saveLocation() {
+        localStorage.setItem('private_key',document.getElementById('private_key').value);
+        alert("保存成功\n当前值为：\n"+localStorage.getItem('private_key'));
+      }
+
+      function clearLocation() {
+        localStorage.removeItem('private_key');
+        if(!localStorage.getItem('private_key')) {
+          alert("清除成功！\n");
+        } else {
+          alert("清除失败！\n");
+        }
+      }
+    </script>
   </body>
 </html>
