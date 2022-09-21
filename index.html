@@ -44,8 +44,10 @@
         <p>注：「-----# #-----」中的内容不参与验证。</p>
         <p>&nbsp;</p>
         <hr />
-        关于数字签名及此页面的验证：<a href="./introduce/introduce.html"><span>介绍页面</span></a>
-        <br/>
+        关于数字签名及此页面的验证：<a href="./introduce/introduce.html"
+          ><span>介绍页面</span></a
+        >
+        <br />
         验签算法为「SHA256withRSA」，且抹去换行符和空格，如需自主验签请移步：
         <a href="https://tianjingli.github.io/rsa_tools/"
           ><span>RSA工具</span></a
@@ -66,44 +68,50 @@
       // 验签公钥在这里
       // 如需生成RSA钥匙对，可前往 : https://tianjingli.github.io/rsa_tools/
       // Tianjingli's Public Key : https://tianjingli.github.io/my_public_key/
-      let publicKey = "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmlosdz+XTNepp5UwNyBoolSJ/RHBGtp9+ekXo3dwS8ucVwWYZ4UsIxx+SUc8R3CtaFJmzNhZ7kzBG+gI8RKEy+my7G2dy9nr4FAMddxOj41Od2sE4FBU3JztzcV1dtU8KXP8+TlMxW63m6Wb0b++i4VsLUuIHLfu9+Bj3rF1suLDIuxmhjpynxBPHUf/hyFJpoAANolrIyGl7MrNju7cmlwztG3mN6bxekimmwzJhK299mYYuRPfAvaVkK39fo7ERyXFigJzlMYVZFD4fzT9jl5zXoOHDfwhHA1R5oleSQVmevdCCex48vYaBBSzRLzp8/ipeLzN13K+AC2RCMbuGQIDAQAB-----END PUBLIC KEY-----";
+      let publicKey =
+        "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmlosdz+XTNepp5UwNyBoolSJ/RHBGtp9+ekXo3dwS8ucVwWYZ4UsIxx+SUc8R3CtaFJmzNhZ7kzBG+gI8RKEy+my7G2dy9nr4FAMddxOj41Od2sE4FBU3JztzcV1dtU8KXP8+TlMxW63m6Wb0b++i4VsLUuIHLfu9+Bj3rF1suLDIuxmhjpynxBPHUf/hyFJpoAANolrIyGl7MrNju7cmlwztG3mN6bxekimmwzJhK299mYYuRPfAvaVkK39fo7ERyXFigJzlMYVZFD4fzT9jl5zXoOHDfwhHA1R5oleSQVmevdCCex48vYaBBSzRLzp8/ipeLzN13K+AC2RCMbuGQIDAQAB-----END PUBLIC KEY-----";
 
       function verifySignature() {
         // 抹去换行符和空格
         let input = document.getElementById("input").value.replace(/\n*/g, "");
         input = input.replace(/\s+/g, "");
-        if (input.length>0) {
-          let inputArr = input.split('#');
-          if (input.length >= 344 && inputArr.length>=3) {
-            let tipLength = inputArr[inputArr.length-2].length + 6 + 6;
-            var jsEncrypt = new JSEncrypt();
-            let message = input.slice(0, input.length - 344 - tipLength);
-            let signature = input.slice(input.length - 344, input.length);
-            console.log("Signature = " + signature);
-            console.log("Message = " + message);
-            if (signature.length > 0 && message.length > 0) {
-              jsEncrypt.setPublicKey(publicKey);
-              
-              var verified = jsEncrypt.verify(
-                message,
-                signature,
-                CryptoJS.SHA256
-              );
-              if (verified == true) {
-                document.getElementById("verify_output").style.cssText =
-                  "color : green";
-                document.getElementById("verify_output").innerHTML = "验证成功";
-              } else {
-                document.getElementById("verify_output").style.cssText =
-                  "color : red";
-                document.getElementById("verify_output").innerHTML = "验证失败";
+        if (input.length > 0) {
+          // 识别「-----# #-----」中的内容
+          let inputArr = input.split("#");
+          let inputArrLength = inputArr.length;
+          if (input.length >= 344 && inputArrLength >= 3) {
+            // 判断「-----# #-----」符号是否被篡改
+            if (
+              inputArr[inputArrLength - 1].slice(0, 5) == "-----" &&
+              inputArr[inputArrLength - 3].slice(inputArr[inputArrLength - 3].length-5, inputArr[inputArrLength - 3].length) == "-----"
+            ) {
+              let tipLength = inputArr[inputArr.length - 2].length + 6 + 6;
+              var jsEncrypt = new JSEncrypt();
+              let message = input.slice(0, input.length - 344 - tipLength);
+              let signature = input.slice(input.length - 344, input.length);
+              console.log("Signature = " + signature);
+              console.log("Message = " + message);
+              if (signature.length > 0 && message.length > 0) {
+                jsEncrypt.setPublicKey(publicKey);
+
+                var verified = jsEncrypt.verify(
+                  message,
+                  signature,
+                  CryptoJS.SHA256
+                );
+                if (verified == true) {
+                  document.getElementById("verify_output").style.cssText =
+                    "color : green";
+                  document.getElementById("verify_output").innerHTML =
+                    "验证成功";
+                  return;
+                }
               }
             }
-          } else {
-            document.getElementById("verify_output").style.cssText =
-              "color : red";
-            document.getElementById("verify_output").innerHTML = "验证失败";
           }
+          document.getElementById("verify_output").style.cssText =
+            "color : red";
+          document.getElementById("verify_output").innerHTML = "验证失败";
         } else {
           document.getElementById("verify_output").style.cssText =
             "color : gray";
