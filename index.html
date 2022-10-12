@@ -1,130 +1,135 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width initial-scale=1" />
-    <meta name="apple-touch-fullscreen" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width initial-scale=1"/>
+    <meta name="apple-touch-fullscreen" content="yes"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
     <link
-      href="https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext"
-      rel="stylesheet"
-      type="text/css"
+            href="https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext"
+            rel="stylesheet"
+            type="text/css"
     />
-    <link href="./css/style.css" rel="stylesheet" type="text/css" />
+    <link href="./css/style.css" rel="stylesheet" type="text/css"/>
     <title>数字签名验证页 - tianjingli.github.io</title>
-  </head>
-  <body class="typora-export">
-    <div class="typora-export-content">
-      <div id="write" class="">
+</head>
+<body class="typora-export">
+<div class="typora-export-content">
+    <div id="write" class="">
         <h1><span>Tianjingli的数字签名验证页</span></h1>
 
         <strong
-          ><span>注意：认准「tianjingli.github.io」开头的域名！</span></strong
+        ><span>注意：认准「tianjingli.github.io」开头的域名！</span></strong
         >
 
-        <hr />
+        <hr/>
         <p><span>请将信息粘贴在此：</span></p>
 
         <textarea
-          id="input"
-          class="md-fences md-end-block ty-contain-cm modeLoaded"
-          rows="6"
-          style="width: 100%; resize: none; margin: 0 auto"
-          onkeyup="verifySignature()"
+                id="input"
+                class="md-fences md-end-block ty-contain-cm modeLoaded"
+                rows="6"
+                style="width: 100%; resize: none; margin: 0 auto"
+                onkeyup="verifySignature()"
         ></textarea>
-        <br />
+        <br/>
         <button onclick="paste()">粘贴</button>
         <button onclick="verifySignature()">再次验证</button>
         <p>&nbsp;</p>
         <h3>
-          验证结果：<strong
-            ><span id="verify_output" style="color: gray">无</span></strong
-          >
+            验证结果：<strong
+        ><span id="verify_output" style="color: gray">无</span></strong
+        >
         </h3>
         <p>注：「-----# #-----」中的内容不参与验证。</p>
         <p>&nbsp;</p>
-        <hr />
+        <hr/>
         关于数字签名及此页面的验证：<a href="./introduce/introduce.html"
-          ><span>介绍页面</span></a
-        >
-        <br />
+    ><span>介绍页面</span></a
+    >
+        <br/>
         验签算法为「SHA256withRSA」，且抹去换行符和空格，如需自主验签请移步：
         <a href="https://tianjingli.github.io/js_rsa_tools/"
-          ><span>RSA工具</span></a
+        ><span>RSA工具</span></a
         >
-        <br />
+        <br/>
         验签公钥为：
         <a href="https://tianjingli.github.io/my_public_key/"
-          ><span>Tianjingli的RSA公钥</span></a
+        ><span>Tianjingli的RSA公钥</span></a
         >
-        <br />
+        <br/>
         <a href="https://tianjingli.github.io"><span>主页</span></a>
-      </div>
     </div>
-    <script src="./js/jsencrypt.min.js"></script>
-    <script src="./js/crypto-js.min.js"></script>
-    <script src="./js/clipboard.js"></script>
-    <script>
-      // 验签公钥在这里
-      // 如需生成RSA钥匙对，可前往 : https://tianjingli.github.io/rsa_tools/
-      // Tianjingli's Public Key : https://tianjingli.github.io/my_public_key/
-      let publicKey =
-        "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmlosdz+XTNepp5UwNyBoolSJ/RHBGtp9+ekXo3dwS8ucVwWYZ4UsIxx+SUc8R3CtaFJmzNhZ7kzBG+gI8RKEy+my7G2dy9nr4FAMddxOj41Od2sE4FBU3JztzcV1dtU8KXP8+TlMxW63m6Wb0b++i4VsLUuIHLfu9+Bj3rF1suLDIuxmhjpynxBPHUf/hyFJpoAANolrIyGl7MrNju7cmlwztG3mN6bxekimmwzJhK299mYYuRPfAvaVkK39fo7ERyXFigJzlMYVZFD4fzT9jl5zXoOHDfwhHA1R5oleSQVmevdCCex48vYaBBSzRLzp8/ipeLzN13K+AC2RCMbuGQIDAQAB-----END PUBLIC KEY-----";
+</div>
+<script src="./js/jsencrypt.min.js"></script>
+<script src="./js/crypto-js.min.js"></script>
+<script src="./js/clipboard.js"></script>
+<script src="./js/jquery-3.6.1.min.js"></script>
+<script>
+    // 验签公钥在这里
+    // 如需生成RSA钥匙对，可前往 : https://tianjingli.github.io/rsa_tools/
+    // Tianjingli's Public Key : https://tianjingli.github.io/my_public_key/
+    var publicKey = $.ajax({
+        type:'GET',
+        url:'https://tianjingli.github.io/my_public_key/my_public_key',
+        dataType:"String",
+        async:false
+    }).responseText
 
-      function verifySignature() {
+    function verifySignature() {
         // 抹去换行符和空格
         let input = document.getElementById("input").value.replace(/\n*/g, "");
         input = input.replace(/\s+/g, "");
         if (input.length > 0) {
-          // 识别「-----# #-----」中的内容
-          let inputArr = input.split("#");
-          let inputArrLength = inputArr.length;
-          if (input.length >= 344 && inputArrLength >= 3) {
-            // 判断「-----# #-----」符号是否被篡改
-            if (
-              inputArr[inputArrLength - 1].slice(0, 5) == "-----" &&
-              inputArr[inputArrLength - 3].slice(inputArr[inputArrLength - 3].length-5, inputArr[inputArrLength - 3].length) == "-----"
-            ) {
-              let tipLength = inputArr[inputArr.length - 2].length + 6 + 6;
-              var jsEncrypt = new JSEncrypt();
-              let message = input.slice(0, input.length - 344 - tipLength);
-              let signature = input.slice(input.length - 344, input.length);
-              console.log("Signature = " + signature);
-              console.log("Message = " + message);
-              if (signature.length > 0 && message.length > 0) {
-                jsEncrypt.setPublicKey(publicKey);
+            // 识别「-----# #-----」中的内容
+            let inputArr = input.split("#");
+            let inputArrLength = inputArr.length;
+            if (input.length >= 344 && inputArrLength >= 3) {
+                // 判断「-----# #-----」符号是否被篡改
+                if (
+                    inputArr[inputArrLength - 1].slice(0, 5) == "-----" &&
+                    inputArr[inputArrLength - 3].slice(inputArr[inputArrLength - 3].length - 5, inputArr[inputArrLength - 3].length) == "-----"
+                ) {
+                    let tipLength = inputArr[inputArr.length - 2].length + 6 + 6;
+                    var jsEncrypt = new JSEncrypt();
+                    let message = input.slice(0, input.length - 344 - tipLength);
+                    let signature = input.slice(input.length - 344, input.length);
+                    console.log("Signature = " + signature);
+                    console.log("Message = " + message);
+                    if (signature.length > 0 && message.length > 0) {
+                        jsEncrypt.setPublicKey(publicKey);
 
-                var verified = jsEncrypt.verify(
-                  message,
-                  signature,
-                  CryptoJS.SHA256
-                );
-                if (verified == true) {
-                  document.getElementById("verify_output").style.cssText =
-                    "color : green";
-                  document.getElementById("verify_output").innerHTML =
-                    "验证成功";
-                  return;
+                        var verified = jsEncrypt.verify(
+                            message,
+                            signature,
+                            CryptoJS.SHA256
+                        );
+                        if (verified == true) {
+                            document.getElementById("verify_output").style.cssText =
+                                "color : green";
+                            document.getElementById("verify_output").innerHTML =
+                                "验证成功";
+                            return;
+                        }
+                    }
                 }
-              }
             }
-          }
-          document.getElementById("verify_output").style.cssText =
-            "color : red";
-          document.getElementById("verify_output").innerHTML = "验证失败";
+            document.getElementById("verify_output").style.cssText =
+                "color : red";
+            document.getElementById("verify_output").innerHTML = "验证失败";
         } else {
-          document.getElementById("verify_output").style.cssText =
-            "color : gray";
-          document.getElementById("verify_output").innerHTML = "无";
+            document.getElementById("verify_output").style.cssText =
+                "color : gray";
+            document.getElementById("verify_output").innerHTML = "无";
         }
-      }
+    }
 
-      function paste() {
+    function paste() {
         navigator.clipboard.readText().then((text) => {
-          document.getElementById("input").value = text;
-          verifySignature();
+            document.getElementById("input").value = text;
+            verifySignature();
         });
-      }
-    </script>
-  </body>
+    }
+</script>
+</body>
 </html>
