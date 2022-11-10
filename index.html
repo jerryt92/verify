@@ -11,15 +11,15 @@
             type="text/css"
     />
     <link href="./css/style.css" rel="stylesheet" type="text/css"/>
-    <title>数字签名验证页 - tianjingli.github.io</title>
+    <title>数字签名验证页 - jerryt92.github.io</title>
 </head>
 <body class="typora-export">
 <div class="typora-export-content">
     <div id="write" class="">
-        <h1><span>Tianjingli的数字签名验证页</span></h1>
+        <h1><span>JerryT 的数字签名验证页</span></h1>
 
         <strong
-        ><span>注意：认准「tianjingli.github.io」开头的域名！</span></strong
+        ><span>注意：认准「jerryt92.github.io」开头的域名！</span></strong
         >
 
         <hr/>
@@ -49,16 +49,16 @@
     >
         <br/>
         验签算法为「SHA256withRSA」，且抹去换行符和空格，如需自主验签请移步：
-        <a href="https://tianjingli.github.io/js_rsa_tools/"
+        <a href="https://jerryt92.github.io/js_rsa_tools/"
         ><span>RSA工具</span></a
         >
         <br/>
         验签公钥为：
-        <a href="https://tianjingli.github.io/my_public_key/"
-        ><span>Tianjingli的RSA公钥</span></a
+        <a href="https://jerryt92.github.io/my_public_key/"
+        ><span>JerryT的RSA公钥</span></a
         >
         <br/>
-        <a href="https://tianjingli.github.io"><span>主页</span></a>
+        <a href="https://jerryt92.github.io"><span>主页</span></a>
     </div>
 </div>
 <script src="./js/jsencrypt.min.js"></script>
@@ -67,11 +67,11 @@
 <script src="./js/jquery-3.6.1.min.js"></script>
 <script>
     // 验签公钥在这里
-    // 如需生成RSA钥匙对，可前往 : https://tianjingli.github.io/rsa_tools/
-    // Tianjingli's Public Key : https://tianjingli.github.io/my_public_key/
+    // 如需生成RSA钥匙对，可前往 : https://jerryt92.github.io/rsa_tools/
+    // JerryT's Public Key : https://jerryt92.github.io/my_public_key/
     var publicKey = $.ajax({
         type:'GET',
-        url:'https://tianjingli.github.io/my_public_key/my_public_key',
+        url:'https://jerryt92.github.io/my_public_key/my_public_key',
         dataType:"String",
         async:false
     }).responseText
