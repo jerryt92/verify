@@ -2,4 +2,4 @@
 
 ## 谨防诈骗！
 
-https://tianjingli.github.io/verify/
+https://jerryt92.github.io/verify/
