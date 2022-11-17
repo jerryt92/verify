@@ -69,9 +69,9 @@
         <button
           id="button"
           onclick="rsaSign();copy('button','output')"
-          onmouseout="this.innerHTML='双击复制'"
+          onmouseout="this.innerHTML='一键复制'"
         >
-          双击复制
+          一键复制
         </button>
         <hr />
         <a href="https://jerryt92.github.io/my_public_key/"
@@ -121,20 +121,16 @@
       }
 
       function copy(btn_id, value_id) {
-        var btn = document.getElementById(btn_id);
-        var clipboard = new ClipboardJS(btn, {
-          //绑定元素id
-          text: function () {
-            var str = document.getElementById(value_id).value;
-            return str;
-          },
-        });
-        clipboard.on("success", function (e) {
-          btn.innerHTML = "已复制";
-        });
-        clipboard.on("error", function (e) {
-          alert("内容为空");
-        });
+          navigator.clipboard.writeText(document.getElementById(value_id).value)
+              .then(
+                  function () {
+                      console.log('复制成功');
+                      document.getElementById(btn_id).innerHTML = '已复制';
+                  }, function (e) {
+                      console.log(e);
+                      console.log('复制失败');
+                      alert(e);
+                  });
       }
 
       function saveLocation() {
